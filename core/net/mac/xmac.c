@@ -306,21 +306,21 @@ powercycle(struct rtimer *t, void *ptr)
     schedule_powercycle(t, xmac_config.on_time);
     PT_YIELD(&pt);
 
-    if(xmac_config.off_time > 0 && !NETSTACK_RADIO.receiving_packet()) {
-      powercycle_turn_radio_off();
-      if(waiting_for_packet != 0) {
-	waiting_for_packet++;
-	if(waiting_for_packet > 2) {
-	  /* We should not be awake for more than two consecutive
-	     power cycles without having heard a packet, so we turn off
-	     the radio. */
-	  waiting_for_packet = 0;
-	  powercycle_turn_radio_off();
+	 if (xmac_config.off_time > 0 && !NETSTACK_RADIO.receiving_packet()) {
+		powercycle_turn_radio_off();
+		if (waiting_for_packet != 0) {
+			waiting_for_packet++;
+			if (waiting_for_packet > 2) {
+				/* We should not be awake for more than two consecutive
+				 power cycles without having heard a packet, so we turn off
+				 the radio. */
+				waiting_for_packet = 0;
+				powercycle_turn_radio_off();
+			}
+		}
+		schedule_powercycle(t, xmac_config.off_time);
+		PT_YIELD(&pt);
 	}
-      }
-      schedule_powercycle(t, xmac_config.off_time);
-      PT_YIELD(&pt);
-    }
   }
 
   PT_END(&pt);
